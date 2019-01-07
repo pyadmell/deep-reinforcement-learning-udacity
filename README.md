@@ -1,5 +1,26 @@
-# Udacity Deep Reinforcement Learning Nanodegree Projecrs
- Udacity Deep Reinforcement Learning Nanodegree projects
+# Udacity Deep Reinforcement Learning Nanodegree Projects
+ 
+This repository contains the Udacity's Deep Reinforcement Learning Nanodegree projects.
+
+---
+
+## Projects
+All of the projects are based on simulation environments from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The projects include:
+
+### [Navigation](./p1_navigation/Report.ipynb)
+
+![]()
+
+The goal in this project is to implement and train a DQN agent to collect yellow bananas while avoiding blue bananas. Refer to [/p1_navigation](./p1_navigation) folder for the project description and [report](./p1_navigation/Report.ipynb). 
+
+### Continuous Control
+
+TBD
+
+### Collaboration and Competition
+
+TBD
+
 
 ## Dependencies
 
