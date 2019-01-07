@@ -42,7 +42,7 @@ conda clean -tp
 ```
 5. Activate `drlnd` conda environment:
 ```bash
-source activate drlnd
+conda activate drlnd
 ```
 6. Clone the [Udacity's deep-reinforcement-learning repository](https://github.com/udacity/deep-reinforcement-learning), and navigate to the repository folder to install the additional dependencies.
 ```bash

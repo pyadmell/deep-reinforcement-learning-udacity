@@ -1,0 +1,22 @@
+name: drlnd
+channels:
+    - default
+dependencies:
+    - python==3.6.3
+    - pip:
+        - tensorflow==1.7.1
+        - Pillow>=4.2.1
+        - matplotlib>=3.0.2
+        - numpy>=1.11.0
+        - jupyter>=1.0.0
+        - pytest>=3.2.2
+        - docopt>=0.6.2
+        - pyyaml
+        - protobuf==3.5.2
+        - grpcio==1.11.0
+        - torch==0.4.0
+        - pandas>=0.23.4
+        - scipy>=1.2.0
+        - ipykernel>=5.1.0
+        - gym[box2d]==0.10.5
+        - gym[classic_control]==0.10.5
