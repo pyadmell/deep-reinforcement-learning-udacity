@@ -2,6 +2,15 @@
  
 This repository contains the Udacity's Deep Reinforcement Learning Nanodegree projects.
 
+## Table of Contents
+
+1. [Project Details](#project-details)
+    1. [Navigation](#navigation)
+    1. [Continuous Control](#continuous-control)
+    1. [Collaboration and Competition](#collaboration-and-competition)
+1. [Getting Started & Dependencies](#getting-started-and-dependencies)
+1. [Instructions](#instructions)
+
 ---
 
 ## Project Details
@@ -23,7 +32,7 @@ TBD
 TBD
 
 
-## Getting Started & Dependencies
+## Getting Started and Dependencies
 
 Ffollow the instructions below to install the dependencies and set up the python environment:
 
@@ -32,7 +41,7 @@ Ffollow the instructions below to install the dependencies and set up the python
 ```bash
 conda env create -f environment.yml
 ```
-3. Verify the `drlnd` environment:
+3. Verify the `drlnd` environment:Instructions
 ```bahs
 conda info --envs
 ```
@@ -59,3 +68,15 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 jupyter-notebook .
 ```
 9. Before running the jupyter notebooks, make sure the kernel is set to `drlnd`. If not, change the environment by using the drop-down `Kernel` menu. 
+
+## Instructions
+
+- Navigation:
+    - Project folder: [p1_navigation](./p1_navigation)
+    - Project files:
+        - [Report.ipynb](./p1_navigation/Report.ipynb): project report and solution
+        - [dqn_agent.py](./p1_navigation/dqn_agent.py): dqn implementation
+        - [model.py](./p1_navigation/model.py): the neural network model architecture
+        - [banana-32-32-checkpoint.pth](./p1_navigation/banana-32-32-checkpoint.pth): saved model weights
+        - [training_plot.png](./p1_navigation/training_plot.png): the training plot showing reward per episode
+    - Follow [Report.ipynb](./p1_navigation/Report.ipynb) for further details.
