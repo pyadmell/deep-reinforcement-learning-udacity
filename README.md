@@ -35,6 +35,8 @@ The Navigation project is based on the [Banana Collector](https://github.com/Uni
         - 1: move backward
         - 2: turn left
         - 3: turn right
+
+![banana-collector-env](./doc/img/banana-collector-env.png)
         
 #### Reward
 
