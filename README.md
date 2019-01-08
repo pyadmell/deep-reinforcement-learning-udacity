@@ -7,7 +7,7 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 1. [Project Details](#project-details)
     1. [Navigation](#navigation)
         1. [State-Action Represenation](#state-action-represenation)
-        1. [Reward](#Reward)
+        1. [Reward](#reward)
 1. [Getting Started & Dependencies](#getting-started-and-dependencies)
 1. [Instructions](#instructions)
 
@@ -45,11 +45,10 @@ The agent receives a reward of +1 for collecting a yellow banana, and a reward o
 This project depends on Banana environment and PyTorch along with some other Python packages. Follow the instructions below to install the dependencies and set up the python environment:
 
 0. Download the Banana environment that matches your operating system:
-
-    Linux: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
-    Mac OSX: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
-    Windows (32-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
-    Windows (64-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
+    - Linux: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
+    - Mac OSX: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
+    - Windows (32-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
+    - Windows (64-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
 
 1. Download and install [miniconda3](https://conda.io/miniconda.html).
 2. Create the miniconda environment:
