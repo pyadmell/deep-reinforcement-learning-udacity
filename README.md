@@ -40,6 +40,36 @@ The Navigation project is based on the [Banana Collector](https://github.com/Uni
 
 The agent receives a reward of +1 for collecting a yellow banana, and a reward of -1 if collecting a blue banana.
 
+## Result
+
+A vanilla DQN agent was considered for this project. The environment was solved in less than 600 episodes:
+
+```bash
+Episode 100     Average Score: 0.53
+Episode 200     Average Score: 3.04
+Episode 300     Average Score: 7.31
+Episode 400     Average Score: 9.53
+Episode 500     Average Score: 12.25
+Episode 600     Average Score: 14.07 --> (13+ average score in less than 600 episodes)
+Episode 700     Average Score: 14.71
+Episode 800     Average Score: 15.47
+Episode 900     Average Score: 15.98
+Episode 1000    Average Score: 16.28
+Episode 1100    Average Score: 16.39
+Episode 1200    Average Score: 16.39
+Episode 1300    Average Score: 16.42
+Episode 1400    Average Score: 16.44
+Episode 1500    Average Score: 16.34
+Episode 1600    Average Score: 16.31
+Episode 1700    Average Score: 16.34
+Episode 1800    Average Score: 16.60
+Episode 1900    Average Score: 16.96
+Episode 2000    Average Score: 16.29
+```
+
+![training_plot.png](./p1_navigation/training_plot.png)
+
+
 ## Getting Started and Dependencies
 
 This project depends on Banana environment and PyTorch along with some other Python packages. Follow the instructions below to install the dependencies and set up the python environment:
