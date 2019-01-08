@@ -6,6 +6,8 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 
 1. [Project Details](#project-details)
     1. [Navigation](#navigation)
+        1. [State-Action Represenation](#state-action-represenation)
+        1. [Reward](#Reward)
 1. [Getting Started & Dependencies](#getting-started-and-dependencies)
 1. [Instructions](#instructions)
 
@@ -13,17 +15,41 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 
 ## Project Details
 
-All of the projects are based on simulation environments from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The projects include:
+![banana-collector](./doc/gif/banana-collector.gif)
 
 ### [Navigation](./p1_navigation/Report.ipynb)
 
-The goal in this project is to implement and train a DQN agent to collect yellow bananas while avoiding blue bananas. Refer to [/p1_navigation](./p1_navigation) folder for the project description and [report](./p1_navigation/Report.ipynb). 
+The Navigation project is based on the [Banana Collector](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#banana-collector) environment from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The goal in this project is to implement and train a DQN agent to collect yellow bananas while avoiding blue bananas. The task is episodic, and the environment is solved when agent reaches an average score of +13 over 100 consecutive episodes.
 
-![banana-collector](./doc/gif/banana-collector.gif)
+`NOTE:` The project environment is similar to, but not identical to the Banana Collector environment from Unity ML-Agents.
+
+#### State-Action Represenation
+
+- Observation space type: continuous
+    - Observation space size (per agent): 37, corresponding to:
+        - velocity of agent
+        - ray-based perception of objects around agent's forward direction
+- Action space type: discrete
+    - Action space size (per agent): 4, corresponding to:
+        - 0: move forward
+        - 1: move backward
+        - 2: turn left
+        - 3: turn right
+        
+#### Reward
+
+The agent receives a reward of +1 for collecting a yellow banana, and a reward of -1 if collecting a blue banana.
 
 ## Getting Started and Dependencies
 
-Ffollow the instructions below to install the dependencies and set up the python environment:
+This project depends on Banana environment and PyTorch along with some other Python packages. Follow the instructions below to install the dependencies and set up the python environment:
+
+0. Download the Banana environment that matches your operating system:
+
+    Linux: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
+    Mac OSX: [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
+    Windows (32-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
+    Windows (64-bit): [download here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
 
 1. Download and install [miniconda3](https://conda.io/miniconda.html).
 2. Create the miniconda environment:
@@ -42,7 +68,7 @@ conda clean -tp
 ```bash
 conda activate drlnd
 ```
-6. Clone the [Udacity's deep-reinforcement-learning repository](https://github.com/udacity/deep-reinforcement-learning), and navigate to the repository folder to install the additional dependencies.
+6. Clone the [Udacity's deep-reinforcement-learning repository](https://github.com/udacity/deep-reinforcement-learning), and navigate to the repository folder to install the additional dependencies including the ML-Agents toolkit, and a few more Python packages required for this project:
 ```bash
 git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning
@@ -69,4 +95,4 @@ jupyter-notebook .
         - [model.py](./p1_navigation/model.py): the neural network model architecture
         - [banana-32-32-checkpoint.pth](./p1_navigation/banana-32-32-checkpoint.pth): saved model weights
         - [training_plot.png](./p1_navigation/training_plot.png): the training plot showing reward per episode
-    - Follow [Report.ipynb](./p1_navigation/Report.ipynb) for further details.
+    - Refer to [/p1_navigation](./p1_navigation) folder for the solution implementation and [report](./p1_navigation/Report.ipynb). 
