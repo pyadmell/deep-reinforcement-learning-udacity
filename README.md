@@ -19,7 +19,7 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 
 ### [Navigation](./p1_navigation/Report.ipynb)
 
-The Navigation project is based on the [Banana Collector](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#banana-collector) environment from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The goal in this project is to implement and train a DQN agent to collect yellow bananas while avoiding blue bananas. The task is episodic, and the environment is solved when agent reaches an average score of +13 over 100 consecutive episodes.
+The Navigation project is based on the [Banana Collector](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#banana-collector) environment from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The goal in this project is to implement and train a Q-learning based agent to collect yellow bananas while avoiding blue bananas. The task is episodic, and the environment is considered to be solved when the agent reaches an average score of +13 over 100 consecutive episodes.
 
 `NOTE:` The project environment is similar to, but not identical to the Banana Collector environment from Unity ML-Agents.
 
