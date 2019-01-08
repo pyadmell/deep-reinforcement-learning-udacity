@@ -23,7 +23,6 @@ class QNetwork(nn.Module):
 
     def forward(self, state):
         """Build a network that maps state -> action values."""
-        "*** YOUR CODE HERE ***"
         for linear in self.hidden_layers:
             state = F.relu(linear(state))
         return self.output(state)
