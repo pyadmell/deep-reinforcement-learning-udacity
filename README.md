@@ -6,8 +6,6 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 
 1. [Project Details](#project-details)
     1. [Navigation](#navigation)
-    1. [Continuous Control](#continuous-control)
-    1. [Collaboration and Competition](#collaboration-and-competition)
 1. [Getting Started & Dependencies](#getting-started-and-dependencies)
 1. [Instructions](#instructions)
 
@@ -22,15 +20,6 @@ All of the projects are based on simulation environments from [Unity ML-Agents](
 The goal in this project is to implement and train a DQN agent to collect yellow bananas while avoiding blue bananas. Refer to [/p1_navigation](./p1_navigation) folder for the project description and [report](./p1_navigation/Report.ipynb). 
 
 ![banana-collector](./doc/gif/banana-collector.gif)
-
-### Continuous Control
-
-TBD
-
-### Collaboration and Competition
-
-TBD
-
 
 ## Getting Started and Dependencies
 
@@ -76,6 +65,7 @@ jupyter-notebook .
     - Project files:
         - [Report.ipynb](./p1_navigation/Report.ipynb): project report and solution
         - [dqn_agent.py](./p1_navigation/dqn_agent.py): dqn implementation
+        - [replay_buffer.py](./p1_navigation/replay_buffer.py): replay buffer implementation
         - [model.py](./p1_navigation/model.py): the neural network model architecture
         - [banana-32-32-checkpoint.pth](./p1_navigation/banana-32-32-checkpoint.pth): saved model weights
         - [training_plot.png](./p1_navigation/training_plot.png): the training plot showing reward per episode
