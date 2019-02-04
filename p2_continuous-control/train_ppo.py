@@ -19,8 +19,6 @@ g_env_info = g_env.reset(train_mode=True)[g_brain_name]
 g_num_agents = len(g_env_info.agents)
 g_action_size = g_brain.vector_action_space_size
 g_state_size = g_env_info.vector_observations.shape[1]
-print("g_action_size:{}".format(g_action_size))
-print("g_state_size:{}".format(g_state_size))
 
 
 # In[3]:
@@ -95,16 +93,6 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
         #state = torch.from_numpy(env_info.vector_observations).float().unsqueeze(0).to(g_device)
         state = torch.from_numpy(env_info.vector_observations).float().to(g_device)
         action, log_prob, _, value = policy(state=state)
-        """
-        est_action = est_action.squeeze().cpu().detach()
-        dist = torch.distributions.Normal(est_action, F.softplus(g_dist_std))
-        action = dist.sample().numpy()
-        action = np.clip(action,-1.0,1.0)
-        value = value.squeeze().cpu().detach().numpy()
-
-        log_prob = dist.log_prob(action)
-        log_prob = torch.sum(log_prob, dim=1, keepdim=True).cpu().detach().numpy()
-        """
         action = action.cpu().detach().numpy()
         action = np.clip(action,-1.0,1.0)
         log_prob = log_prob.cpu().detach().numpy()
@@ -140,10 +128,11 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
         # Set start values
         GAE_current = torch.zeros(n_agent).float().to(g_device)
 
-        TAU = 0.95
+        #TAU = 0.95
+        TAU = 1.0
         discount = 0.99
-        values_next = values[-1]
-        returns_current = values_next
+        values_next = values[-1].detach()
+        returns_current = values[-1].detach()
         for irow in reversed(range(n_step)):
             values_current = values[irow]
             rewards_current = rewards[irow]
@@ -161,12 +150,12 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
             values_next = values_current
 
         return GAE, returns
-    gea_list, target_value_list = calc_returns(rewards = reward_list,
-                                               values = value_list,
-                                              dones=done_list)
+    gea_list, target_value_list = calc_returns(rewards = deepcopy(reward_list),
+                                               values = deepcopy(value_list),
+                                              dones=deepcopy(done_list))
     gea_list = (gea_list - gea_list.mean()) / (gea_list.std() + 1e-6)
     # return states, actions, rewards
-    return prob_list, state_list, action_list, reward_list, value_list, gea_list, target_value_list
+    return deepcopy(prob_list), deepcopy(state_list), deepcopy(action_list), deepcopy(reward_list), deepcopy(value_list), deepcopy(gea_list), deepcopy(target_value_list)
 
 
 # In[5]:
@@ -202,7 +191,6 @@ beta = .01
 SGD_epoch = 10
 episode = 150
 batch_size = 128
-#tmax = max(10*batch_size,int(30.0/0.1),1024)
 tmax = batch_size
 
 print_per_n = min(10,episode/10)
@@ -221,11 +209,12 @@ for e in range(episode):
     scores_window.append(average_total_rewards)
 
     # cat all agents
-    old_probs_lst = old_probs_lst.reshape([-1])
-    states_lst = states_lst.reshape([-1])
-    actions_lst = actions_lst.reshape([-1])
-    rewards_lst = rewards_lst.reshape([-1])
-    values_lst = values_lst.reshape([-1])
+    old_probs_lst = np.array(old_probs_lst).reshape([-1])
+    states_lst = torch.cat(states_lst)
+    actions_lst = np.array(actions_lst)
+    actions_lst = actions_lst.reshape([-1, actions_lst.shape[-1]])
+    rewards_lst = np.array(rewards_lst).reshape([-1])
+    values_lst = np.array(values_lst).reshape([-1])
     gea = gea.reshape([-1])
     target_value = target_value.reshape([-1])
 
@@ -233,17 +222,17 @@ for e in range(episode):
     n_sample = len(old_probs_lst)//batch_size
     idx = np.arange(len(old_probs_lst))
     np.random.shuffle(idx)
-    for b in range(n_sample):
-        ind = idx[b*batch_size:(b+1)*batch_size]
-        op = [old_probs_lst[i] for i in ind]
-        s = [states_lst[i] for i in ind]
-        a = [actions_lst[i] for i in ind]
-        r = [rewards_lst[i] for i in ind]
-        v = [values_lst[i] for i in ind]
-        g = gea[ind]
-        tv = target_value[ind]
-        policy.train()
-        for epoch in range(SGD_epoch):
+    policy.train()
+    for epoch in range(SGD_epoch):
+        for b in range(n_sample):
+            ind = idx[b*batch_size:(b+1)*batch_size]
+            op = [old_probs_lst[i] for i in ind]
+            s = [states_lst[i] for i in ind]
+            a = [actions_lst[i] for i in ind]
+            r = [rewards_lst[i] for i in ind]
+            v = [values_lst[i] for i in ind]
+            g = gea[ind]
+            tv = target_value[ind]
             l_clip, critic_loss, entropy_loss, clipped_sur, states, actions, old_log_probs, advantages_batch = clipped_surrogate(policy=policy,
                                                                                                                                  old_probs=op,
                                                                                                                                  states=s,
@@ -262,21 +251,13 @@ for e in range(episode):
             loss_actor = -torch.mean(adv_PPO) - 0.01 * entropy.mean()
             loss_critic = 0.5 * (tv - values).pow(2).mean()
             loss = loss_actor + loss_critic
-
-            #L = -l_clip+critic_loss
-            #L = -l_clip
-            #print("-l_clip:{}".format(-l_clip), end="\n")
-            #print("critic_loss:{}".format(critic_loss), end="\n")
-            #print("clipped_sur:{}".format(torch.mean(clipped_sur)), end="\n")
-            #print("L:{}".format(L))
             optimizer.zero_grad()
             # we need to specify retain_graph=True on the backward pass
             # this is because pytorch automatically frees the computational graph after
             # the backward pass to save memory
             # Without the computational graph, the chain of derivative is lost
-            #L.backward()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.)
+            #torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.)
             optimizer.step()
             del(loss)
 
