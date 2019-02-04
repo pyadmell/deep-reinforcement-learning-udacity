@@ -72,6 +72,9 @@ from copy import deepcopy
 
 def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
 
+    def to_tensor(x, dtype=np.float32):
+        return torch.from_numpy(np.array(x).astype(dtype)).to(g_device)
+
     #initialize returning lists and start the game!
     state_list=[]
     reward_list=[]
@@ -90,7 +93,17 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
         env_info = envs.step(action)[g_brain_name]
 
     for t in range(tmax):
-        #state = torch.from_numpy(env_info.vector_observations).float().unsqueeze(0).to(g_device)
+        ##########################################################################
+        states = to_tensor(env_info.vector_observations)
+        pred = policy(states)
+        pred = [v.detach() for v in pred]
+        actions, log_probs, _, values = pred
+        actions_np = actions.cpu().numpy()
+        env_info = envs.step(actions_np)[g_brain_name]
+        rewards = to_tensor(env_info.rewards)
+        dones = to_tensor(env_info.local_done, dtype=np.uint8)
+        ##########################################################################
+        """
         state = torch.from_numpy(env_info.vector_observations).float().to(g_device)
         action, log_prob, _, value = policy(state=state)
         action = action.cpu().detach().numpy()
@@ -102,44 +115,48 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
         #reward = torch.tensor(env_info.rewards, dtype=torch.float, device=g_device)
         reward = env_info.rewards
         dones = env_info.local_done
-
-        state_list.append(state)
-        prob_list.append(log_prob)
-        action_list.append(action)
-        reward_list.append(reward)
-        value_list.append(value)
-        done_list.append(dones)
+        """
+        state_list.append(states.unsqueeze(0))
+        prob_list.append(log_probs.unsqueeze(0))
+        action_list.append(actions.unsqueeze(0))
+        reward_list.append(rewards.unsqueeze(0))
+        value_list.append(values.unsqueeze(0))
+        done_list.append(dones.unsqueeze(0))
         if np.any(dones):
             env_info = envs.reset(train_mode=train_mode)[g_brain_name]
 
+    state_list = torch.cat(state_list, dim=0)
+    prob_list = torch.cat(prob_list, dim=0)
+    action_list = torch.cat(action_list, dim=0)
+    reward_list = torch.cat(reward_list, dim=0)
+    value_list = torch.cat(value_list, dim=0)
+    done_list = torch.cat(done_list, dim=0)
     def calc_returns(rewards, values, dones):
         n_step = len(rewards)
         n_agent = len(rewards[0])
 
-        rewards = torch.from_numpy(np.array(rewards).astype(np.float32)).to(g_device)
-        values = torch.from_numpy(np.array(values).astype(np.float32)).to(g_device)
-        dones = torch.from_numpy(np.array(dones).astype(np.uint8)).to(g_device)
+        #rewards = torch.from_numpy(np.array(rewards).astype(np.float32)).to(g_device)
+        #values = torch.from_numpy(np.array(values).astype(np.float32)).to(g_device)
+        #dones = torch.from_numpy(np.array(dones).astype(np.uint8)).to(g_device)
 
         # Create empty buffer
         GAE = torch.zeros(n_step,n_agent).float().to(g_device)
         returns = torch.zeros(n_step,n_agent).float().to(g_device)
-        
 
         # Set start values
         GAE_current = torch.zeros(n_agent).float().to(g_device)
 
-        #TAU = 0.95
-        TAU = 1.0
+        TAU = 0.95
         discount = 0.99
         values_next = values[-1].detach()
         returns_current = values[-1].detach()
         for irow in reversed(range(n_step)):
             values_current = values[irow]
             rewards_current = rewards[irow]
-            gamma = discount * (1.0 - dones[irow].float())
+            gamma = discount * (1. - dones[irow].float())
 
             # Calculate TD Error
-            td_error = rewards_current + gamma*values_next - values_current
+            td_error = rewards_current + gamma * values_next - values_current
             # Update GAE, returns
             GAE_current = td_error + gamma * TAU * GAE_current
             returns_current = rewards_current + gamma * returns_current
@@ -150,12 +167,15 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
             values_next = values_current
 
         return GAE, returns
+
+        return GAE, returns
     gea_list, target_value_list = calc_returns(rewards = deepcopy(reward_list),
                                                values = deepcopy(value_list),
                                               dones=deepcopy(done_list))
     gea_list = (gea_list - gea_list.mean()) / (gea_list.std() + 1e-6)
     # return states, actions, rewards
-    return deepcopy(prob_list), deepcopy(state_list), deepcopy(action_list), deepcopy(reward_list), deepcopy(value_list), deepcopy(gea_list), deepcopy(target_value_list)
+    #return deepcopy(prob_list), deepcopy(state_list), deepcopy(action_list), deepcopy(reward_list), deepcopy(value_list), deepcopy(gea_list), deepcopy(target_value_list)
+    return prob_list, state_list, action_list, reward_list, value_list, gea_list, target_value_list
 
 
 # In[5]:
@@ -205,47 +225,40 @@ for e in range(episode):
                                                                                                               nrand = 0,
                                                                                                               train_mode=True)
 
-    average_total_rewards = np.sum(rewards_lst,0).mean()
+    policy.train()
+
+    #average_total_rewards = np.sum(rewards_lst,0).mean()
+    average_total_rewards = rewards_lst.sum(0).mean()
     scores_window.append(average_total_rewards)
 
     # cat all agents
-    old_probs_lst = np.array(old_probs_lst).reshape([-1])
-    states_lst = torch.cat(states_lst)
-    actions_lst = np.array(actions_lst)
-    actions_lst = actions_lst.reshape([-1, actions_lst.shape[-1]])
-    rewards_lst = np.array(rewards_lst).reshape([-1])
-    values_lst = np.array(values_lst).reshape([-1])
-    gea = gea.reshape([-1])
-    target_value = target_value.reshape([-1])
+    def cat_all(v):
+        if len(v.shape) == 3:
+            return v.reshape([-1, v.shape[-1]])
+        return v.reshape([-1])
+
+    old_probs_lst = cat_all(old_probs_lst)
+    states_lst = cat_all(states_lst)
+    actions_lst = cat_all(actions_lst)
+    rewards_lst = cat_all(rewards_lst)
+    values_lst = cat_all(values_lst)
+    gea = cat_all(gea)
+    target_value = cat_all(target_value)
 
     # gradient ascent step
     n_sample = len(old_probs_lst)//batch_size
     idx = np.arange(len(old_probs_lst))
     np.random.shuffle(idx)
-    policy.train()
     for epoch in range(SGD_epoch):
         for b in range(n_sample):
             ind = idx[b*batch_size:(b+1)*batch_size]
-            op = [old_probs_lst[i] for i in ind]
-            s = [states_lst[i] for i in ind]
-            a = [actions_lst[i] for i in ind]
-            r = [rewards_lst[i] for i in ind]
-            v = [values_lst[i] for i in ind]
+            #print("len: {} \t ind0:{} \t ind1:{}".format(len(ind),ind[0],ind[-1]))
             g = gea[ind]
             tv = target_value[ind]
-            l_clip, critic_loss, entropy_loss, clipped_sur, states, actions, old_log_probs, advantages_batch = clipped_surrogate(policy=policy,
-                                                                                                                                 old_probs=op,
-                                                                                                                                 states=s,
-                                                                                                                                 actions=a,
-                                                                                                                                 rewards=r,
-                                                                                                                                 values=v,
-                                                                                                                                 gea = g,
-                                                                                                                                 target_value = tv,
-                                                                                                                                 discount = discount,
-                                                                                                                                 epsilon=epsilon,
-                                                                                                                                 beta=beta)
-            _, log_probs, entropy, values = policy(states, actions)
-            ratio = torch.exp(log_probs - old_log_probs)
+            actions = torch.tensor(actions_lst[ind], dtype=torch.float, device=g_device)
+            old_probs = torch.tensor(old_probs_lst[ind], dtype=torch.float, device=g_device)
+            _, log_probs, entropy, values = policy(states_lst[ind], actions)
+            ratio = torch.exp(log_probs - old_probs)
             ratio_clamped = torch.clamp(ratio, 1 - epsilon, 1 + epsilon)
             adv_PPO = torch.min(ratio * g, ratio_clamped * g)
             loss_actor = -torch.mean(adv_PPO) - 0.01 * entropy.mean()
