@@ -17,10 +17,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import torch.optim as optim
-from policy import Policy
+from actor_critic import ActorCritic
 
-#g_env = UnityEnvironment(file_name='./Reacher_Linux_Multi/Reacher.x86_64')
-g_env = UnityEnvironment(file_name='/home/peyman/Projects/tmp/expt/bin/Reacher_Linux/Reacher.x86_64')
+g_env = UnityEnvironment(file_name='./Reacher_Linux_Multi/Reacher.x86_64')
+#g_env = UnityEnvironment(file_name='/home/peyman/Projects/tmp/expt/bin/Reacher_Linux/Reacher.x86_64')
 
 
 # In[2]:
@@ -64,9 +64,19 @@ def collect_trajectories(envs, policy, tmax=200, nrand=5, train_mode=False):
     for t in range(tmax):
         ##########################################################################
         states = to_tensor(env_info.vector_observations)
-        pred = policy(states)
-        pred = [v.detach() for v in pred]
-        actions, log_probs, _, values = pred
+        #pred = policy(states)
+        #pred = [v.detach() for v in pred]
+        #actions, log_probs, _, values = pred
+        ############################################
+        action_est, values = policy(states)
+        sigma = nn.Parameter(torch.zeros(g_action_size))
+        dist = torch.distributions.Normal(action_est, F.softplus(sigma).to(g_device))
+        actions = dist.sample()
+        log_probs = dist.log_prob(actions)
+        log_probs = torch.sum(log_probs, dim=-1).detach()
+        values = values.detach()
+        actions = actions.detach()
+        ############################################
         actions_np = actions.cpu().numpy()
         env_info = envs.step(actions_np)[g_brain_name]
         rewards = to_tensor(env_info.rewards)
@@ -127,9 +137,12 @@ def calc_returns(rewards, values, dones):
 
 # run your own policy!
 #[512, 256]
-policy=Policy(state_size=g_state_size,
+policy=ActorCritic(state_size=g_state_size,
               action_size=g_action_size,
-              hidden_layers=[128, 64],
+              shared_layers=[128, 64],
+              critic_hidden_layers=[],
+              actor_hidden_layers=[],
+              init_type='xavier-uniform',
               seed=0).to(g_device)
 
 # we use the adam optimizer with learning rate 2e-4
@@ -198,22 +211,33 @@ for e in range(episode):
             tv = target_value[ind]
             actions = actions_lst[ind]
             old_probs = old_probs_lst[ind]
-            _, log_probs, entropy, values = policy(states_lst[ind], actions)
+            #_, log_probs, entropy, values = policy(states_lst[ind], actions)
+            ############################################
+            action_est, values = policy(states_lst[ind], actions)
+            sigma = nn.Parameter(torch.zeros(g_action_size))
+            dist = torch.distributions.Normal(action_est, F.softplus(sigma).to(g_device))
+            log_probs = dist.log_prob(actions)
+            log_probs = torch.sum(log_probs, dim=-1)
+            entropy = torch.sum(dist.entropy(), dim=-1)
+            ############################################
             ratio = torch.exp(log_probs - old_probs)
-            ratio_clamped = torch.clamp(ratio, 1 - epsilon, 1 + epsilon)
-            adv_PPO = torch.min(ratio * g, ratio_clamped * g)
-            loss_actor = -torch.mean(adv_PPO) - beta * entropy.mean()
-            loss_critic = 0.5 * (tv - values).pow(2).mean()
-            loss = loss_actor + loss_critic
+            ratio_clipped = torch.clamp(ratio, 1 - epsilon, 1 + epsilon)
+            L_CLIP = torch.mean(torch.min(ratio*g, ratio_clipped*g))
+            # entropy bonus
+            S = entropy.mean()
+            # squared-error value function loss
+            L_VF = 0.5 * (tv - values).pow(2).mean()
+            # clipped surrogate
+            L = -(L_CLIP - L_VF + beta*S)
             optimizer.zero_grad()
             # we need to specify retain_graph=True on the backward pass
             # this is because pytorch automatically frees the computational graph after
             # the backward pass to save memory
             # Without the computational graph, the chain of derivative is lost
-            loss.backward(retain_graph=True)
+            L.backward(retain_graph=True)
             torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.0)
             optimizer.step()
-            del(loss)
+            del(L)
 
     # the clipping parameter reduces as time goes on
     epsilon*=.999
