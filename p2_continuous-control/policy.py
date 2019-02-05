@@ -20,11 +20,13 @@ class Policy(nn.Module):
         layer_sizes = zip(hidden_layers[:-1], hidden_layers[1:])
         self.hidden_layers.extend([nn.Linear(h1, h2) for h1, h2 in layer_sizes])
         # Critic output layer
-        #self.critic_hidden = nn.Linear(hidden_layers[-1],16)
-        self.critic = nn.Linear(hidden_layers[-1], 1)
+        c_hid = 32
+        a_hid = 32
+        self.critic_hidden = nn.Linear(hidden_layers[-1],c_hid)
+        self.critic = nn.Linear(c_hid, 1)
         # Actor output layer
-        #self.actor_hidden = nn.Linear(hidden_layers[-1], 16)
-        self.actor = nn.Linear(hidden_layers[-1], action_size)
+        self.actor_hidden = nn.Linear(hidden_layers[-1], a_hid)
+        self.actor = nn.Linear(a_hid, action_size)
         # Apply Tanh() to bound the actions
         self.tanh = nn.Tanh()
 
@@ -43,8 +45,8 @@ class Policy(nn.Module):
                 else:
                     return
         self.hidden_layers.apply(init)
-        #self.critic_hidden.apply(init)
-        #self.actor_hidden.apply(init)
+        self.critic_hidden.apply(init)
+        self.actor_hidden.apply(init)
         self.critic.apply(init)
         self.actor.apply(init)
 
@@ -54,9 +56,10 @@ class Policy(nn.Module):
             #state = F.relu(linear(state))
             state = F.leaky_relu(linear(state))
 
-        v = state
-        a = F.tanh(self.actor(v))
-        value = self.critic(v).squeeze(-1)
+        v_hid = F.leaky_relu(self.critic_hidden(state))
+        a_hid = F.leaky_relu(self.actor_hidden(state))
+        a = F.tanh(self.actor(a_hid))
+        value = self.critic(v_hid).squeeze(-1)
         dist = torch.distributions.Normal(a, F.softplus(self.sigma))
         if action is None:
             action = dist.sample()
