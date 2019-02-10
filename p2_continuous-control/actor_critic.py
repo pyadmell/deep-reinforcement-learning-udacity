@@ -1,19 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-def build_hidden_layer(input_dim, hidden_layers):
-    """Build hidden layer.
-    Params
-    ======
-        input_dim (int): Dimension of hidden layer input
-        hidden_layers (list(int)): Dimension of hidden layers
-    """
-    hidden = nn.ModuleList([nn.Linear(input_dim, hidden_layers[0])])
-    if len(hidden_layers)>1:
-        layer_sizes = zip(hidden_layers[:-1], hidden_layers[1:])
-        hidden.extend([nn.Linear(h1, h2) for h1, h2 in layer_sizes])
-    return hidden
+from utils import build_hidden_layer
 
 class ActorCritic(nn.Module):
     def __init__(self,state_size,action_size,shared_layers,
@@ -93,8 +81,8 @@ class ActorCritic(nn.Module):
             else:
                 raise KeyError('initialization type is not found in the set of existing types')
 
-    def forward(self, state, action=None):
-        """Build a network that maps state -> action, log_prob, entropy, and value function."""
+    def forward(self, state):
+        """Build a network that maps state -> (action, value)."""
         def apply_multi_layer(layers,x,f=F.leaky_relu):
             for layer in layers:
                 x = f(layer(x))
@@ -113,12 +101,3 @@ class ActorCritic(nn.Module):
         a = self.tanh(self.actor(a_hid))
         value = self.critic(v_hid).squeeze(-1)
         return a, value
-"""
-        dist = torch.distributions.Normal(a, F.softplus(self.sigma))
-        if action is None:
-            action = dist.sample()
-        log_prob = dist.log_prob(action)
-        log_prob = torch.sum(log_prob, dim=-1)
-        entropy = torch.sum(dist.entropy(), dim=-1)
-        return action, log_prob, entropy, value
-"""

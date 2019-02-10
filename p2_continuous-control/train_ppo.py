@@ -139,9 +139,9 @@ def calc_returns(rewards, values, dones):
 #[512, 256]
 policy=ActorCritic(state_size=g_state_size,
               action_size=g_action_size,
-              shared_layers=[128, 64],
-              critic_hidden_layers=[],
-              actor_hidden_layers=[],
+              shared_layers=[128, 128],
+              critic_hidden_layers=[64],
+              actor_hidden_layers=[64],
               init_type='xavier-uniform',
               seed=0).to(g_device)
 
@@ -174,7 +174,6 @@ for e in range(episode):
                                                                                                        nrand = 0,
                                                                                                        train_mode=True)
 
-    #avg_score = np.sum(rewards_lst,0).mean()
     avg_score = rewards_lst.sum(dim=0).mean().item()
     scores_window.append(avg_score)
 
@@ -206,14 +205,12 @@ for e in range(episode):
     for epoch in range(opt_epoch):
         for b in range(n_sample):
             ind = idx[b*batch_size:(b+1)*batch_size]
-            #print("len: {} \t ind0:{} \t ind1:{}".format(len(ind),ind[0],ind[-1]))
             g = gea[ind]
             tv = target_value[ind]
             actions = actions_lst[ind]
             old_probs = old_probs_lst[ind]
-            #_, log_probs, entropy, values = policy(states_lst[ind], actions)
             ############################################
-            action_est, values = policy(states_lst[ind], actions)
+            action_est, values = policy(states_lst[ind])
             sigma = nn.Parameter(torch.zeros(g_action_size))
             dist = torch.distributions.Normal(action_est, F.softplus(sigma).to(g_device))
             log_probs = dist.log_prob(actions)
