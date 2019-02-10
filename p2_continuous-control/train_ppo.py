@@ -9,6 +9,7 @@ from collections import deque
 import timeit
 from datetime import timedelta
 from copy import deepcopy
+import matplotlib.pyplot as plt
 import numpy as np
 from unityagents import UnityEnvironment
 
@@ -19,7 +20,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from actor_critic import ActorCritic
 
-g_env = UnityEnvironment(file_name='./Reacher_Linux_Multi/Reacher.x86_64')
+g_env = UnityEnvironment(file_name='./Reacher_Linux/Reacher.x86_64')
 #g_env = UnityEnvironment(file_name='/home/peyman/Projects/tmp/expt/bin/Reacher_Linux/Reacher.x86_64')
 
 
@@ -147,12 +148,13 @@ policy=ActorCritic(state_size=g_state_size,
 
 # we use the adam optimizer with learning rate 2e-4
 # optim.SGD is also possible
-optimizer = optim.Adam(policy.parameters(), lr=1e-4)
+optimizer = optim.Adam(policy.parameters(), lr=2e-4)
 
 
 # In[7]:
 
 scores_window = deque(maxlen=100)  # last 100 scores
+save_scores = []
 
 discount = 0.99
 epsilon = 0.1
@@ -176,6 +178,7 @@ for e in range(episode):
 
     avg_score = rewards_lst.sum(dim=0).mean().item()
     scores_window.append(avg_score)
+    save_scores.append(avg_score)
 
     gea, target_value = calc_returns(rewards = rewards_lst,
                                      values = values_lst,
@@ -265,6 +268,20 @@ print("Elapsed time: {}".format(timedelta(seconds=elapsed)))
 print("Saving checkpoint!")
 # save your policy!
 torch.save(policy.state_dict(), 'checkpoint.pth')
+
+# save data
+import pickle
+pickle.dump(save_scores, open( "saved_scors.p", "wb" ) )
+
+# plot scores
+import matplotlib.pyplot as plt
+fig = plt.figure()
+ax = fig.add_subplot(111)
+plt.plot(np.arange(len(save_scores)), save_scores)
+plt.ylabel('Score')
+plt.xlabel('Episode #')
+plt.savefig('scores_plot.png')
+plt.show()
 
 
 # In[ ]:
