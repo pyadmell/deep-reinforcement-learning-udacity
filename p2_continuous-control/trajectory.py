@@ -17,23 +17,25 @@ class Trajectory:
             seed (int): random seed
         """
         self.memory = []
-        self.trajectory = namedtuple("Trajectory", field_names=["observation",
+        self.trajectory = namedtuple("Trajectory", field_names=["state",
+                                                                "action",
+                                                                "log_prob",
                                                                 "advantage",
                                                                 "target_value"])
         self.seed = random.seed(seed)
 
-    def add(self, observation, advantage, target_value):
+    def add(self, state, action, log_prob, advantage, target_value):
         """Add a new trajectory step to memory."""
-        t = self.trajectory(observation, advantage, target_value)
+        t = self.trajectory(state, action, log_prob, advantage, target_value)
         self.memory.append(t)
     
     def sample(self, batch_size):
         """Randomly sample a batch of trajectory steps from memory."""
         trajectory = random.sample(self.memory, k=batch_size)
 
-        states = torch.from_numpy(np.vstack([t.observation.state for t in trajectory if t is not None])).float().to(device)
-        actions = torch.from_numpy(np.vstack([t.observation.action for t in trajectory if t is not None])).float().to(device)
-        log_probs = torch.from_numpy(np.vstack([t.observation.log_prob for t in trajectory if t is not None])).float().to(device)
+        states = torch.from_numpy(np.vstack([t.state for t in trajectory if t is not None])).float().to(device)
+        actions = torch.from_numpy(np.vstack([t.action for t in trajectory if t is not None])).float().to(device)
+        log_probs = torch.from_numpy(np.vstack([t.log_prob for t in trajectory if t is not None])).float().to(device)
         advantages = torch.from_numpy(np.vstack([t.advantage for t in trajectory if t is not None])).float().to(device)
         target_values = torch.from_numpy(np.vstack([t.target_value for t in trajectory if t is not None])).float().to(device)
 

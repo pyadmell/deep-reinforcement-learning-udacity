@@ -52,3 +52,6 @@ class Observation(object):
     def __iter__(self):
         """Returns an iterator of internal memory buffer."""
         return iter(self.memory)
+
+    def __getitem__(self,key):
+        return self.memory[key]
