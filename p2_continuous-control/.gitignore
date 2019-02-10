@@ -4,3 +4,5 @@ Reacher_Linux_Multi/Reacher_Data
 Reacher_Linux_Single/
 /Reacher_Linux_Single
 /Reacher_Linux_Multi
+/Reacher_Linux_Multi/*
+/Reacher_Linux_Single/*
