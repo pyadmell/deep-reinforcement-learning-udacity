@@ -92,5 +92,6 @@ jupyter-notebook .
     - [actor_critic.py](./p3_collab-compet/actor_critic.py): the neural network model architecture
     - [utils.py](./p3_collab-compet/utils.py): utilities for creating network
     - [Tennis-PPO.ipynb](./p3_collab-compet/Tennis-PPO.ipynb): PPO implementation, training, and evaluation
-    - [ppo_128x128_a64_c64_207e.pth](./p3_collab-compet/ppo_128x128_a64_c64_207e.pth): saved model weights
+    - [ppo_128x128_a64_c64_207e.pth](./p3_collab-compet/ppo_128x128_a64_c64_207e.pth): saved model weights for 207 episodes of training
+	- [ppo_128x128_a64_c64_2000e.pth](./p3_collab-compet/ppo_128x128_a64_c64_2000e.pth): saved model weights for 2000 episodes of training
 - Refer to [/p3_collab-compet](./p3_collab-compet) folder for the solution implementation and [report](./p3_collab-compet/Report.md). 
