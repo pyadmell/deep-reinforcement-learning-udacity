@@ -8,59 +8,37 @@ PPO calculates gradient based on the policy likelihood ratio between old and new
 to avoid gradient explosion. [GAE (Generalized Advantage Estimation)](https://arxiv.org/abs/1506.02438) method was used to estimate the advantage function.
 
 ## Result & Plot of Rewards
-The environment was solved in under 193 episodes.
+The environment was solved in under 180 episodes and reached 0.5 score in average. The training was continued to get an average score of 1.0:
 
 ```bash
-Episode: 10, average score: 1.17
-Episode: 20, average score: 1.39
-Episode: 30, average score: 1.69
-Episode: 40, average score: 2.04
-Episode: 50, average score: 2.46
-Episode: 60, average score: 2.95
-Episode: 70, average score: 3.52
-Episode: 80, average score: 4.26
-Episode: 90, average score: 5.20
-Episode: 100, average score: 6.32
-Episode: 110, average score: 8.19
-Episode: 120, average score: 10.47
-Episode: 130, average score: 12.93
-Episode: 140, average score: 15.65
-Episode: 150, average score: 18.52
-Episode: 160, average score: 21.44
-Episode: 170, average score: 24.32
-Episode: 180, average score: 27.04
-Episode: 190, average score: 29.47
-Environment solved in 193 episodes!	Average Score: 30.15
-Average Score: 30.15
-Elapsed time: 0:26:39.039894
+Episode: 10, average score: -0.33
+Episode: 20, average score: -0.33
+Episode: 30, average score: -0.33
+Episode: 40, average score: -0.34
+Episode: 50, average score: -0.34
+Episode: 60, average score: -0.34
+Episode: 70, average score: -0.34
+Episode: 80, average score: -0.34
+Episode: 90, average score: -0.34
+Episode: 100, average score: -0.33
+Episode: 110, average score: -0.32
+Episode: 120, average score: -0.25
+Episode: 130, average score: -0.15
+Episode: 140, average score: -0.03
+Episode: 150, average score: 0.11
+Episode: 160, average score: 0.25
+Episode: 170, average score: 0.40
+Episode: 180, average score: 0.56
+Episode: 190, average score: 0.73
+Episode: 200, average score: 0.90
+Environment solved in 207 episodes!	Average Score: 1.01
+Average Score: 1.01
+Elapsed time: 0:09:01.293255
 ```
 
 The following figure illustrates the average score over time obtained during training:
 
-![scores_plot.png](./scores_plot.png)
-
-The performance of the trained agent can be viewed in the simulator using `eval_ppo.py` script:
-
-``` bash
-python eval_ppo.py
-```
-
-![reacher_e193](./../doc/gif/reacher_193e.gif)
-
-The model was evaluated after training by loading `ppo_128x128_a64_c64_193e.pth`, and running the environment in evaluation mode (i.e. `train_mode=False`):
-
-```bash
-Episode: 1, score: 37.36899916473776
-Episode: 2, score: 37.552999160625035
-Episode: 3, score: 37.534499161038546
-Episode: 4, score: 37.61199915930628
-Episode: 5, score: 37.618799159154285
-Episode: 6, score: 37.60691582608657
-Episode: 7, score: 37.60857058795434
-Episode: 8, score: 37.58049916001036
-Episode: 9, score: 37.64861026959907
-Episode: 10, score: 37.708999157138166
-```
+![scores_plot](./scores_plot_207e.png)
 
 ## Network Architecture
 An actor-critic structure with continuous action space was used for this project. The policy consists of 3 parts, a shared hidden layers, actor, and critic.

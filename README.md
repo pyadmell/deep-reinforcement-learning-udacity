@@ -5,7 +5,7 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 ## Table of Contents
 
 1. [Project Details](#project-details)
-    1. [Continuous Control](#continuous-control)
+    1. [Collaboration and Competition](#collaboration-and-competition)
         1. [State-Action Represenation](#state-action-represenation)
         1. [Reward](#reward)
 1. [Getting Started & Dependencies](#getting-started-and-dependencies)
@@ -15,45 +15,42 @@ This repository contains the Udacity's Deep Reinforcement Learning Nanodegree pr
 
 ## Project Details
 
-![reacher](./doc/gif/reacher.gif)
+![tennis-env](./doc/gif/tennis-env.gif)
 
-### [Continuous Control](./p2_navigation/Report.md)
+### [Collaboration and Competition](./p3_collab-compet/Report.md)
 
-The Continuous Control project is based on the [Reacher](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#reacher) environment from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). The environment simulates raching task for robot manipulators. Two versions of the environment was provided: a) single agent; and b) Multi-agent with 20 identical agents. For each agent (robot) in the environement, a dynamic target location is defined, shown as green spheres. Robots are suppsoed to track and reach to their target points. The goal in this project is to implement and train an agent to move its hand to the target location, and follow the target location as many time steps as possible. The agent receives +0.1 reward for each timstep that the agent's hand is in the target location. The task is episodic, and the environment is considered to be solved when the agent(s) get an average score of +30 over 100 consecutive episodes. 
+The Collaboration and Competition project is based on the [Tennis](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#tennis)
+environment from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents).
+The environment simulates a two-player table tennis game, where agents control rackets to bounce ball over a net.
+The goal in this project is to implement and train an agent to control the players to keep the ball in play. Each player receives a reward of +0.1 if it hits the ball over the net, 
+and -0.1 if it lets the ball hit the ground or go out of bounds.
+The task is episodic, and the environment is considered solved when the agent reaches an average score of +0.5 over 100 consecutive episodes. 
 
 #### State-Action Represenation
 
 - Observation space type: continuous
-    - Observation space size (per agent): 33, corresponding to:
-        - position, rotation, velocity, and angular velocities of the arms
+    - Observation space size (per agent): 8, corresponding to:
+        - position and velocity of ball and racket
 - Action space type: discrete
-    - Action space size (per agent): 4, corresponding to:
-        - 0: torque_x applied to the 1st joint 
-        - 1: torque_z applied to the 1st joint 
-        - 2: torque_x applied to the 2nd joint 
-        - 3: torque_z applied to the 2nd joint 
-        
+    - Action space size (per agent): 2 (continuous), corresponding to:
+        - movement toward net or away from net, and jumping
+
 #### Reward
 
-Each agent in the environment receives a reward of +0.1 for each timstep that the agent's hand is in the target location.
+- +0.1 if the player hits the ball over net.
+- -0.1 if the player let ball hit the ground, or hit ball out of bounds.
 
 ## Getting Started and Dependencies
 
-This project depends on Banana environment and PyTorch along with some other Python packages. Follow the instructions below to install the dependencies and set up the python environment:
+This project depends on Tennis environment and PyTorch along with some other Python packages. Follow the instructions below to install the dependencies and set up the python environment:
 
 0. Download the Reacher environment that matches your operating system:
-    - **_Version 1: Single Agent_**
-        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux.zip)
-        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher.app.zip)
-        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86.zip)
-        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86_64.zip)
-    - **_Version 2: Multi Agents (20)_**
-        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux.zip)
-        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher.app.zip)
-        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86.zip)
-        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86_64.zip)
+    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
+    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis.app.zip)
+    - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86.zip)
+    - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86_64.zip)
 
-1. Place the file in the DRLND GitHub repository, in the `p2_continuous-control/` folder, and unzip (or decompress) the file. 
+1. Place the file in the DRLND GitHub repository, in the `p3_collab-compet/` folder, and unzip (or decompress) the file. 
 2. Download and install [miniconda3](https://conda.io/miniconda.html).
 3. Create the miniconda environment:
 ```bash
@@ -89,13 +86,11 @@ jupyter-notebook .
 
 ## Instructions
 
-- Navigation:
-    - Project folder: [p2_continuous-control/](./p2_continuous-control/)
-    - Project files:
-        - [Report.md](./p2_continuous-control/Report.md): project report and solution
-        - [actor_critic.py](./p2_continuous-control/actor_critic.py): the neural network model architecture
-        - [utils.py](./p2_continuous-control/utils.py): utilities for creating network
-        - [Continuous_Control_Solution.ipynb](./p2_continuous-control/Continuous_Control_Solution.ipynb): PPO implementation, training, and evaluation
-        - [eval_ppo.py](./p2_continuous-control/eval_ppo.py): evaluation script to test the save model
-        - [ppo_128x64_a0_c0_470e.pth](./p2_continuous-control/ppo_128x64_a0_c0_470e.pth): saved model weights
-    - Refer to [/p2_continuous-control](./p2_continuous-control) folder for the solution implementation and [report](./p2_continuous-control/Report.md). 
+- Project folder: [p3_collab-compet/](./p3_collab-compet/)
+- Project files:
+    - [Report.md](./p3_collab-compet/Report.md): project report and solution
+    - [actor_critic.py](./p3_collab-compet/actor_critic.py): the neural network model architecture
+    - [utils.py](./p3_collab-compet/utils.py): utilities for creating network
+    - [Tennis-PPO.ipynb](./p3_collab-compet/Tennis-PPO.ipynb): PPO implementation, training, and evaluation
+    - [ppo_128x128_a64_c64_207e.pth](./p3_collab-compet/ppo_128x128_a64_c64_207e.pth): saved model weights
+- Refer to [/p3_collab-compet](./p3_collab-compet) folder for the solution implementation and [report](./p3_collab-compet/Report.md). 
