@@ -1,5 +1,9 @@
 # Performance Report
 
+## Environment and Dependencies
+
+Refer to [README](./../README.md) for the environment description and dependencies.
+
 ## Learning Algorithm
 For this project, **PPO (Proximal Policy Optimization)**
 was implemented given continuous nature of the problem. **PPO** is a policy gradient method.  Compared to **TRPO (Trust Region Policy Optimization)**,
@@ -39,6 +43,15 @@ Elapsed time: 0:09:01.293255
 The following figure illustrates the average score over time obtained during training:
 
 ![scores_plot](./scores_plot_207e.png)
+
+To observe the maximum performance, the training was continued for 2000 episodes and 1000 steps per episode.
+The result is shown in the following figure. The training is stable and the score does not collapsed:
+
+![scores_plot_2000](./scores_plot_2000e.png)
+
+The saved model after 2000 episodes was evaluated by loading `ppo_128x128_a64_c64_2000e.pth` model:
+
+![tennis_e2000](./../doc/gif/tennis_2000e.gif)
 
 ## Network Architecture
 An actor-critic structure with continuous action space was used for this project. The policy consists of 3 parts, a shared hidden layers, actor, and critic.
